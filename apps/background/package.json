@@ -5,9 +5,9 @@
   "license": "ISC",
   "author": "",
   "type": "commonjs",
-  "main": "background.js",
+  "main": "dist/background.js",
   "scripts": {
-    "start": "tsc && node background.js",
+    "start": "tsc && node dist/background.js",
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
