@@ -2,16 +2,19 @@ import { Container, Title, Select, Text } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 
 import { getConfig, setConfig } from '@repo/config';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export function Settings() {
     const { t, i18n } = useTranslation();
+    const [openInNewTab, setOpenInNewTab] = useState<string>('true');
 
     useEffect(() => {
         getConfig().then((config) => {
             if (config.language && config.language !== i18n.language) {
                 i18n.changeLanguage(config.language);
             }
+            // Ensure config.newTab is a boolean, default to true if undefined
+            setOpenInNewTab(config.newTab !== false ? 'true' : 'false');
         });
     }, [i18n]);
 
@@ -20,6 +23,13 @@ export function Settings() {
         await i18n.changeLanguage(lang);
         const config = await getConfig();
         await setConfig({ ...config, language: lang });
+    };
+
+    const handleNewTabChange = async (value: string | null) => {
+        const isNewTab = value === 'true';
+        setOpenInNewTab(value || 'true');
+        const config = await getConfig();
+        await setConfig({ ...config, newTab: isNewTab });
     };
 
     return (
@@ -31,6 +41,17 @@ export function Settings() {
                 data={['en', 'zh-TW']}
                 value={i18n.language}
                 onChange={handleLanguageChange}
+            />
+            <Select
+                mt="md"
+                label={t('app.settings.new_tab.label')}
+                placeholder={t('app.settings.new_tab.placeholder')}
+                data={[
+                    { value: 'true', label: t('app.settings.new_tab.yes') },
+                    { value: 'false', label: t('app.settings.new_tab.no') }
+                ]}
+                value={openInNewTab}
+                onChange={handleNewTabChange}
             />
             <Text mt="md" size="sm" c="dimmed">
                 {t('app.settings.language.current', { lng: i18n.language })}
