@@ -1,8 +1,8 @@
 {
     "manifest_version": 3,
-    "name": "Vocabulary Revision",
-    "version": "0.9",
-    "description": "Revise the vocabulary with help of LLM",
+    "name": "Word Notebook",
+    "version": "1.0.0",
+    "description": "Revise the vocabulary with assistance in structure",
     "icons": {
         "16": "icon16.png",
         "48": "icon48.png",
