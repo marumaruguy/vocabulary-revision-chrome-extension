@@ -25,7 +25,8 @@
             }
         },
         "common": {
-            "menu": "Menu"
+            "menu": "Menu",
+            "context_menu": "Check \"%s\""
         }
     }
 }

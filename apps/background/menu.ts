@@ -1,8 +1,11 @@
-export const createMenu = () => {
+import { addVocabulary } from '@repo/database';
+import { v4 as uuidv4 } from 'uuid';
+
+export const createMenu = (title: string) => {
     chrome.contextMenus.create({
         type: 'normal',
         contexts: ['selection'],
-        title: 'Check "%s"',
+        title: title,
         id: 'vocabulary-revision-lite'
     });
 };
@@ -17,9 +20,17 @@ export const addMenuEventListeners = () => {
 
             // const config = await getConfig();
 
-            // const url = await new Promise(resolve => chrome.tabs.query({ active: true, lastFocusedWindow: true }, (tabs) => resolve(tabs[0] ? tabs[0].url : tabs[0])));
+            const url = await new Promise<string>(resolve => chrome.tabs.query({ active: true, lastFocusedWindow: true }, (tabs) => resolve(tabs[0] ? (tabs[0].url || '') : '')));
 
-            // saveVocab(null, text, config.from, config.to, url);
+            if (text) {
+                await addVocabulary({
+                    id: uuidv4(),
+                    word: text,
+                    url: url,
+                    createdAt: new Date(),
+                    updatedAt: new Date()
+                });
+            }
 
             chrome.tabs.create(
                 {
