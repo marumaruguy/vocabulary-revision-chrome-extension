@@ -1,5 +1,55 @@
-# Vocabulary Revision Chrome Extension
+# Word Notebook Chrome Extension
 
-This is a chrome extension that helps users to learn new words and record the words and urls they visited. It is because we better to record the words and the context (url) when we first met the word if we want to remember it better.
+A Chrome extension that helps you build vocabulary by recording words and the URLs where you first encountered them — because context is key to remembering new words.
 
-The ideas is from https://github.com/pakyinwww/vocabulary-revision-lite where it is written by the developer of this extension.
+Inspired by [vocabulary-revision-lite](https://github.com/pakyinwww/vocabulary-revision-lite).
+
+## Features
+
+- **Right-click to save** — Highlight any word on a webpage and right-click to save it along with the page URL
+- **Vocabulary list** — Browse all saved words with their source links and timestamps
+- **First-run onboarding** — Language selection on first launch
+- **Settings** — Configure language, new-tab behaviour, and reset to defaults
+- **Bilingual UI** — English and Traditional Chinese (繁體中文)
+
+## Tech Stack
+
+- **Monorepo**: Turborepo + npm workspaces
+- **Popup**: Vite + React + Mantine UI + React Router + react-i18next
+- **Background**: Vite + TypeScript (Chrome service worker)
+- **Storage**: `chrome.storage.local` (config) + IndexedDB (vocabulary)
+
+## Getting Started
+
+```bash
+# Install dependencies
+npm install
+
+# Development (all apps)
+npm run dev
+
+# Build all apps
+npm run build
+
+# Package as Chrome extension
+npm run build:extension
+```
+
+Then load the `dist/` folder as an unpacked extension in `chrome://extensions`.
+
+## Project Structure
+
+```
+apps/
+  popup/       # React popup UI
+  background/  # Service worker (context menu)
+  manifest/    # manifest.json, icons, assets
+packages/
+  config/      # Chrome storage config helpers
+  database/    # IndexedDB vocabulary CRUD
+  i18n/        # i18next setup + locale files
+```
+
+## License
+
+[MIT](./LICENSE)
