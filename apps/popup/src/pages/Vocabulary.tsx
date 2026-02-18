@@ -1,8 +1,13 @@
-import { Table, ScrollArea, Pagination } from '@mantine/core';
+import { Table, ScrollArea, Pagination, Button, ActionIcon } from '@mantine/core';
+import { IconTrash } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 
-import { getVocabulary, Vocabulary as VocabularyType } from '@repo/database';
+import { getVocabulary, deleteWord, Vocabulary as VocabularyType } from '@repo/database';
 import { useEffect, useState } from 'react';
+
+function onAction() {
+    // placeholder for future action
+}
 
 export function Vocabulary() {
     const { t } = useTranslation();
@@ -10,8 +15,10 @@ export function Vocabulary() {
     const [activePage, setPage] = useState(1);
     const itemsPerPage = 10;
 
+    const refresh = () => getVocabulary().then(setVocabularies);
+
     useEffect(() => {
-        getVocabulary().then(setVocabularies);
+        refresh();
     }, []);
 
     const totalPages = Math.ceil(vocabularies.length / itemsPerPage);
@@ -19,6 +26,11 @@ export function Vocabulary() {
         (activePage - 1) * itemsPerPage,
         activePage * itemsPerPage
     );
+
+    const handleRemove = async (id: string) => {
+        await deleteWord(id);
+        refresh();
+    };
 
     const rows = paginatedVocabularies.map((vocab) => (
         <Table.Tr key={vocab.id}>
@@ -28,7 +40,21 @@ export function Vocabulary() {
                     {t('app.to')}
                 </a>
             </Table.Td>
-            <Table.Td>{new Date(vocab.createdAt).toLocaleDateString()}</Table.Td>
+            <Table.Td>
+                <Button variant="light" size="xs" onClick={onAction}>
+                    {t('app.vocabulary.table.action')}
+                </Button>
+            </Table.Td>
+            <Table.Td>
+                <ActionIcon
+                    variant="subtle"
+                    color="red"
+                    aria-label={t('app.vocabulary.table.remove')}
+                    onClick={() => handleRemove(vocab.id)}
+                >
+                    <IconTrash size={16} />
+                </ActionIcon>
+            </Table.Td>
         </Table.Tr>
     ));
 
@@ -40,7 +66,8 @@ export function Vocabulary() {
                         <Table.Tr>
                             <Table.Th>{t('app.vocabulary.table.word')}</Table.Th>
                             <Table.Th>{t('app.vocabulary.table.url')}</Table.Th>
-                            <Table.Th>{t('app.vocabulary.table.created_at')}</Table.Th>
+                            <Table.Th>{t('app.vocabulary.table.action')}</Table.Th>
+                            <Table.Th>{t('app.vocabulary.table.remove')}</Table.Th>
                         </Table.Tr>
                     </Table.Thead>
                     <Table.Tbody>{rows}</Table.Tbody>

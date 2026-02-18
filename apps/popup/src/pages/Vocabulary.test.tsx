@@ -4,7 +4,7 @@ import { Vocabulary } from '../pages/Vocabulary';
 
 // Mock @repo/database so tests don't touch IndexedDB
 vi.mock('@repo/database', () => ({
-    getAllVocabularies: vi.fn().mockResolvedValue([
+    getVocabulary: vi.fn().mockResolvedValue([
         {
             id: '1',
             word: 'ephemeral',
@@ -39,7 +39,8 @@ describe('Vocabulary page', () => {
         await waitFor(() => {
             expect(screen.getByText('app.vocabulary.table.word')).toBeInTheDocument();
             expect(screen.getByText('app.vocabulary.table.url')).toBeInTheDocument();
-            expect(screen.getByText('app.vocabulary.table.created_at')).toBeInTheDocument();
+            expect(screen.getByText('app.vocabulary.table.action')).toBeInTheDocument();
+            expect(screen.getByText('app.vocabulary.table.remove')).toBeInTheDocument();
         });
     });
 
@@ -52,8 +53,8 @@ describe('Vocabulary page', () => {
     });
 
     it('renders an empty table when there are no vocabularies', async () => {
-        const { getVocabulary: getAllVocabularies } = await import('@repo/database');
-        vi.mocked(getAllVocabularies).mockResolvedValueOnce([]);
+        const { getVocabulary } = await import('@repo/database');
+        vi.mocked(getVocabulary).mockResolvedValueOnce([]);
 
         render(<Vocabulary />);
 

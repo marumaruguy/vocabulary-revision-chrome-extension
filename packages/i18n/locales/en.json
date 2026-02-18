@@ -38,7 +38,8 @@
             "table": {
                 "word": "Word",
                 "url": "Link",
-                "created_at": "Created At"
+                "action": "Action",
+                "remove": "Remove"
             }
         },
         "common": {

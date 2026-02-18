@@ -38,7 +38,8 @@
             "table": {
                 "word": "單字",
                 "url": "連結",
-                "created_at": "建立時間"
+                "action": "操作",
+                "remove": "刪除"
             }
         },
         "common": {
