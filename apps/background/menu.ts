@@ -10,16 +10,13 @@ export const createMenu = (title: string) => {
     });
 };
 
-export const addMenuEventListeners = () => {
+export const addMenuEventListeners = (i18n: any) => {
     chrome.contextMenus.onClicked.addListener(
         async (info) => {
             if (info.menuItemId !== 'vocabulary-revision-lite') {
                 return;
             }
             const text = info.selectionText;
-
-            // const config = await getConfig();
-
             const url = await new Promise<string>(resolve => chrome.tabs.query({ active: true, lastFocusedWindow: true }, (tabs) => resolve(tabs[0] ? (tabs[0].url || '') : '')));
 
             if (text) {
@@ -36,10 +33,21 @@ export const addMenuEventListeners = () => {
                 {
                     url: `https://www.perplexity.ai/search/new?q=${encodeURIComponent(text || '')}`
                 },
-                () => {
-
-                }
+                () => { }
             );
         }
     );
+
+    chrome.storage.onChanged.addListener((changes, areaName) => {
+        if (areaName === 'local' && changes.config) {
+            const newLanguage = changes.config.newValue.language;
+            if (newLanguage && newLanguage !== i18n.language) {
+                i18n.changeLanguage(newLanguage).then(() => {
+                    chrome.contextMenus.update('vocabulary-revision-lite', {
+                        title: i18n.t('app.common.context_menu')
+                    })
+                });
+            }
+        }
+    });
 };
