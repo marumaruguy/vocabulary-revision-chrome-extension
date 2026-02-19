@@ -2,18 +2,25 @@ import { Container, Title, Select, Button, Modal, Group, Text } from '@mantine/c
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
-import { defaultConfig, getConfig, setConfig } from '@repo/config';
+import { defaultConfig, getConfig, setConfig, LLMType } from '@repo/config';
 import { useEffect, useState } from 'react';
+
+const LLM_OPTIONS = [
+    { value: LLMType.perplexity, labelKey: 'app.settings.llm.name.perplexity' },
+    { value: LLMType.googleAI, labelKey: 'app.settings.llm.name.googleAI' },
+    { value: LLMType.google, labelKey: 'app.settings.llm.name.google' },
+] as const;
 
 export function Settings() {
     const { t, i18n } = useTranslation();
     const navigate = useNavigate();
+    const [llm, setLlm] = useState<string>(LLMType.perplexity);
     const [openInNewTab, setOpenInNewTab] = useState<string>('true');
     const [resetModalOpen, setResetModalOpen] = useState(false);
 
     useEffect(() => {
         getConfig().then((config) => {
-            // Ensure config.newTab is a boolean, default to true if undefined
+            setLlm(config.llm ?? LLMType.perplexity);
             setOpenInNewTab(config.newTab !== false ? 'true' : 'false');
         });
     }, [i18n]);
@@ -23,6 +30,13 @@ export function Settings() {
         await i18n.changeLanguage(lang);
         const config = await getConfig();
         await setConfig({ ...config, language: lang });
+    };
+
+    const handleLlmChange = async (value: string | null) => {
+        const next = (value as LLMType) || LLMType.perplexity;
+        setLlm(next);
+        const config = await getConfig();
+        await setConfig({ ...config, llm: next });
     };
 
     const handleNewTabChange = async (value: string | null) => {
@@ -52,6 +66,14 @@ export function Settings() {
                 data={[{ value: 'en', label: t('app.settings.language.name.en') }, { value: 'zh-HK', label: t('app.settings.language.name.zh-HK') }]}
                 value={i18n.language}
                 onChange={handleLanguageChange}
+            />
+            <Select
+                mt="md"
+                label={t('app.settings.llm.label')}
+                placeholder={t('app.settings.llm.placeholder')}
+                data={LLM_OPTIONS.map((o) => ({ value: o.value, label: t(o.labelKey) }))}
+                value={llm}
+                onChange={handleLlmChange}
             />
             <Select
                 mt="md"

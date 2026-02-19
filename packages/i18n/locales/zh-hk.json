@@ -18,6 +18,15 @@
                     "zh-HK": "繁體中文(香港)"
                 }
             },
+            "llm": {
+                "label": "查詢使用",
+                "placeholder": "請選擇",
+                "name": {
+                    "perplexity": "Perplexity",
+                    "googleAI": "Google（AI 摘要）",
+                    "google": "Google"
+                }
+            },
             "new_tab": {
                 "label": "右鍵點擊高亮的單字後，在新分頁開啟",
                 "placeholder": "請選擇",
@@ -46,7 +55,9 @@
         },
         "common": {
             "menu": "選單",
-            "context_menu": "查詢 \"%s\""
+            "context_menu_record": "記錄 \"%s\"",
+            "context_menu_lookup": "記錄並查詢 \"%s\"",
+            "prompt_lookup": "「{{word}}」的中文意思是什麼？請用這個字作一篇短例文"
         },
         "to": "網址"
     }

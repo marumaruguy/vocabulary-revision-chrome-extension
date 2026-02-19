@@ -18,6 +18,15 @@
                     "zh-HK": "Chinese (Traditional)"
                 }
             },
+            "llm": {
+                "label": "Lookup with",
+                "placeholder": "Pick one",
+                "name": {
+                    "perplexity": "Perplexity",
+                    "googleAI": "Google (AI overview)",
+                    "google": "Google"
+                }
+            },
             "new_tab": {
                 "label": "Open in New Tab after right click the highlighted text",
                 "placeholder": "Pick one",
@@ -46,7 +55,9 @@
         },
         "common": {
             "menu": "Menu",
-            "context_menu": "Check \"%s\""
+            "context_menu_record": "Record \"%s\"",
+            "context_menu_lookup": "Record and lookup \"%s\"",
+            "prompt_lookup": "What is the meaning of {{word}} in english? Use it to write a short story also."
         },
         "to": "url"
     }
