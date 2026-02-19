@@ -39,7 +39,7 @@ describe('Vocabulary page', () => {
         await waitFor(() => {
             expect(screen.getByText('app.vocabulary.table.word')).toBeInTheDocument();
             expect(screen.getByText('app.vocabulary.table.url')).toBeInTheDocument();
-            expect(screen.getByText('app.vocabulary.table.action')).toBeInTheDocument();
+            expect(screen.getByText('app.vocabulary.table.lookup')).toBeInTheDocument();
             expect(screen.getByText('app.vocabulary.table.remove')).toBeInTheDocument();
         });
     });

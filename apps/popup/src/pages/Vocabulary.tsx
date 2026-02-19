@@ -1,13 +1,12 @@
 import { Table, ScrollArea, Pagination, Button, ActionIcon, Modal, Group, Text } from '@mantine/core';
-import { IconTrash } from '@tabler/icons-react';
+import { IconTrash, IconSearch } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 
 import { getVocabulary, deleteWord, Vocabulary as VocabularyType } from '@repo/database';
 import { useEffect, useState } from 'react';
+import { getConfig, llmLink } from '@repo/config';
 
-function onAction() {
-    // placeholder for future action
-}
+
 
 export function Vocabulary() {
     const { t } = useTranslation();
@@ -28,6 +27,16 @@ export function Vocabulary() {
         (activePage - 1) * itemsPerPage,
         activePage * itemsPerPage
     );
+
+    const handleLookup = async (word: string) => {
+        const config = await getConfig();
+        chrome.tabs.create(
+            {
+                url: `${llmLink[config.llm]}${encodeURIComponent(t('app.common.prompt_lookup', { word })) || ''} `
+            },
+            () => { }
+        );
+    }
 
     const handleRemove = (id: string) => {
         setPendingDeleteId(id);
@@ -56,9 +65,13 @@ export function Vocabulary() {
                 </a>
             </Table.Td>
             <Table.Td>
-                <Button variant="light" size="xs" onClick={onAction}>
-                    {t('app.vocabulary.table.action')}
-                </Button>
+                <ActionIcon
+                    variant="subtle"
+                    aria-label={t('app.vocabulary.table.lookup')}
+                    onClick={() => handleLookup(vocab.word)}
+                >
+                    <IconSearch size={16} />
+                </ActionIcon>
             </Table.Td>
             <Table.Td>
                 <ActionIcon
@@ -97,7 +110,7 @@ export function Vocabulary() {
                         <Table.Tr>
                             <Table.Th>{t('app.vocabulary.table.word')}</Table.Th>
                             <Table.Th>{t('app.vocabulary.table.url')}</Table.Th>
-                            <Table.Th>{t('app.vocabulary.table.action')}</Table.Th>
+                            <Table.Th>{t('app.vocabulary.table.lookup')}</Table.Th>
                             <Table.Th>{t('app.vocabulary.table.remove')}</Table.Th>
                         </Table.Tr>
                     </Table.Thead>

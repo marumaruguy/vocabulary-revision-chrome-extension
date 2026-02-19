@@ -50,7 +50,7 @@
             "table": {
                 "word": "單字",
                 "url": "連結",
-                "action": "操作",
+                "lookup": "查詢",
                 "remove": "刪除"
             },
             "delete": {

@@ -50,7 +50,7 @@
             "table": {
                 "word": "Word",
                 "url": "Link",
-                "action": "Action",
+                "lookup": "Lookup",
                 "remove": "Remove"
             },
             "delete": {
