@@ -40,20 +40,20 @@ function downloadCsv(csv: string, filename: string) {
 
 export function Vocabulary() {
     const { i18n, t } = useTranslation();
-    const [vocabularies, setVocabularies] = useState<VocabularyType[]>([]);
+    const [vocabulary, setVocabulary] = useState<VocabularyType[]>([]);
     const [activePage, setPage] = useState(1);
     const itemsPerPage = 10;
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
 
-    const refresh = () => getVocabulary().then(setVocabularies);
+    const refresh = () => getVocabulary().then(setVocabulary);
 
     useEffect(() => {
         refresh();
     }, []);
 
-    const totalPages = Math.ceil(vocabularies.length / itemsPerPage);
-    const paginatedVocabularies = vocabularies.slice(
+    const totalPages = Math.ceil(vocabulary.length / itemsPerPage);
+    const paginatedVocabulary = vocabulary.slice(
         (activePage - 1) * itemsPerPage,
         activePage * itemsPerPage
     );
@@ -93,7 +93,7 @@ export function Vocabulary() {
         downloadCsv(csv, filename);
     };
 
-    const rows = paginatedVocabularies.map((vocab) => (
+    const rows = paginatedVocabulary.map((vocab) => (
         <Table.Tr key={vocab.id}>
             <Table.Td>{vocab.word}</Table.Td>
             <Table.Td>
