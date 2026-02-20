@@ -15,7 +15,7 @@
                 "current": "Current Language/當前語言: {{lng}}",
                 "name": {
                     "en": "English",
-                    "zh-HK": "Traditional Chinese (Hong Kong)"
+                    "zh-HK": "繁體中文(香港)"
                 }
             },
             "llm": {
