@@ -1,12 +1,13 @@
 import { Table, ScrollArea, Pagination, Button, ActionIcon, Modal, Group, Text, Title, TextInput, Stack, List } from '@mantine/core';
-import { IconTrash, IconSearch, IconPlus } from '@tabler/icons-react';
+import { IconTrash, IconSearch, IconPlus, IconLink, IconPencil } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 
-import { getVocabulary, deleteWord, addWord, Vocabulary as VocabularyType } from '@repo/database';
+import { getVocabulary, deleteWord, addWord, updateWord, Vocabulary as VocabularyType } from '@repo/database';
 import { useEffect, useState } from 'react';
 import { getConfig, llmLink, getLookupPrompt } from '@repo/config';
 
 const CSV_COLUMNS = ['id', 'word', 'url', 'createdAt', 'updatedAt'] as const;
+const FUNCTION_COLUMN_WIDTH = '65px'
 
 function escapeCsvCell(value: string): string {
     if (/[",\n\r]/.test(value)) {
@@ -49,6 +50,11 @@ export function Vocabulary() {
     const [addWordValue, setAddWordValue] = useState('');
     const [addUrlValue, setAddUrlValue] = useState('');
     const [addWordError, setAddWordError] = useState('');
+    const [editOpen, setEditOpen] = useState(false);
+    const [editingVocab, setEditingVocab] = useState<VocabularyType | null>(null);
+    const [editWordValue, setEditWordValue] = useState('');
+    const [editUrlValue, setEditUrlValue] = useState('');
+    const [editWordError, setEditWordError] = useState('');
 
     const refresh = () => getVocabulary().then(setVocabulary);
 
@@ -56,8 +62,14 @@ export function Vocabulary() {
         refresh();
     }, []);
 
-    const totalPages = Math.ceil(vocabulary.length / itemsPerPage);
-    const paginatedVocabulary = vocabulary.slice(
+    const sortedVocabulary = [...vocabulary].sort((a, b) => {
+        const aTime = new Date(a.createdAt).getTime();
+        const bTime = new Date(b.createdAt).getTime();
+        return bTime - aTime;
+    });
+
+    const totalPages = Math.ceil(sortedVocabulary.length / itemsPerPage);
+    const paginatedVocabulary = sortedVocabulary.slice(
         (activePage - 1) * itemsPerPage,
         activePage * itemsPerPage
     );
@@ -119,6 +131,36 @@ export function Vocabulary() {
         refresh();
     };
 
+    const handleOpenEdit = (vocab: VocabularyType) => {
+        setEditingVocab(vocab);
+        setEditWordValue(vocab.word);
+        setEditUrlValue(vocab.url || '');
+        setEditWordError('');
+        setEditOpen(true);
+    };
+
+    const handleCloseEdit = () => {
+        setEditOpen(false);
+        setEditingVocab(null);
+        setEditWordError('');
+    };
+
+    const handleConfirmEdit = async () => {
+        if (!editingVocab) return;
+        const word = editWordValue.trim();
+        const wordMissing = !word;
+        setEditWordError(wordMissing ? t('app.vocabulary.edit.word_required') : '');
+        if (wordMissing) return;
+        await updateWord({
+            ...editingVocab,
+            word,
+            url: editUrlValue.trim() || '',
+            updatedAt: new Date(),
+        });
+        handleCloseEdit();
+        refresh();
+    };
+
     const handleExport = async () => {
         const all = await getVocabulary();
         const csv = vocabularyToCsvRows(all);
@@ -131,9 +173,16 @@ export function Vocabulary() {
             <Table.Td>{vocab.word}</Table.Td>
             <Table.Td>
                 {vocab.url ? (
-                    <a href={vocab.url} target="_blank" rel="noreferrer">
-                        {t('app.to')}
-                    </a>
+                    <ActionIcon
+                        component="a"
+                        href={vocab.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        variant="subtle"
+                        aria-label={t('app.to')}
+                    >
+                        <IconLink size={16} />
+                    </ActionIcon>
                 ) : null}
             </Table.Td>
             <Table.Td>
@@ -143,6 +192,15 @@ export function Vocabulary() {
                     onClick={() => handleLookup(vocab.word)}
                 >
                     <IconSearch size={16} />
+                </ActionIcon>
+            </Table.Td>
+            <Table.Td>
+                <ActionIcon
+                    variant="subtle"
+                    aria-label={t('app.vocabulary.table.edit')}
+                    onClick={() => handleOpenEdit(vocab)}
+                >
+                    <IconPencil size={16} />
                 </ActionIcon>
             </Table.Td>
             <Table.Td>
@@ -203,6 +261,39 @@ export function Vocabulary() {
                 </Stack>
             </Modal>
             <Modal
+                opened={editOpen}
+                onClose={handleCloseEdit}
+                title={t('app.vocabulary.edit.title')}
+                centered
+            >
+                <Stack gap="sm">
+                    <TextInput
+                        label={t('app.vocabulary.edit.word_label')}
+                        placeholder={t('app.vocabulary.edit.word_label')}
+                        value={editWordValue}
+                        onChange={(e) => {
+                            setEditWordValue(e.currentTarget.value);
+                            setEditWordError('');
+                        }}
+                        error={editWordError}
+                    />
+                    <TextInput
+                        label={t('app.vocabulary.edit.url_label')}
+                        placeholder={t('app.vocabulary.edit.url_label')}
+                        value={editUrlValue}
+                        onChange={(e) => setEditUrlValue(e.currentTarget.value)}
+                    />
+                    <Group justify="flex-end">
+                        <Button variant="default" size="xs" onClick={handleCloseEdit}>
+                            {t('app.vocabulary.edit.cancel')}
+                        </Button>
+                        <Button size="xs" onClick={handleConfirmEdit}>
+                            {t('app.vocabulary.edit.confirm')}
+                        </Button>
+                    </Group>
+                </Stack>
+            </Modal>
+            <Modal
                 opened={confirmOpen}
                 onClose={handleCancelDelete}
                 title={t('app.vocabulary.delete.title')}
@@ -223,9 +314,10 @@ export function Vocabulary() {
                     <Table.Thead>
                         <Table.Tr>
                             <Table.Th>{t('app.vocabulary.table.word')}</Table.Th>
-                            <Table.Th>{t('app.vocabulary.table.url')}</Table.Th>
-                            <Table.Th>{t('app.vocabulary.table.lookup')}</Table.Th>
-                            <Table.Th>{t('app.vocabulary.table.remove')}</Table.Th>
+                            <Table.Th w={FUNCTION_COLUMN_WIDTH}>{t('app.vocabulary.table.url')}</Table.Th>
+                            <Table.Th w={FUNCTION_COLUMN_WIDTH}>{t('app.vocabulary.table.lookup')}</Table.Th>
+                            <Table.Th w={FUNCTION_COLUMN_WIDTH}>{t('app.vocabulary.table.edit')}</Table.Th>
+                            <Table.Th w={FUNCTION_COLUMN_WIDTH}>{t('app.vocabulary.table.remove')}</Table.Th>
                         </Table.Tr>
                     </Table.Thead>
                     {
@@ -233,7 +325,7 @@ export function Vocabulary() {
                             <Table.Tbody>{rows}</Table.Tbody>
                         ) :
                             <Table.Tbody><Table.Tr>
-                                <Table.Td colSpan={4}>
+                                <Table.Td colSpan={5}>
                                     <Stack gap="sm" pt="md">
                                         <Title order={3} ta="center">{t('app.vocabulary.table.no_data')}</Title>
                                         <List type="ordered" spacing="xs">
