@@ -8,7 +8,6 @@ import { useEffect, useState } from 'react';
 const LLM_OPTIONS = [
     { value: LLMType.perplexity, labelKey: 'app.settings.llm.name.perplexity' },
     { value: LLMType.googleAI, labelKey: 'app.settings.llm.name.googleAI' },
-    { value: LLMType.google, labelKey: 'app.settings.llm.name.google' },
 ] as const;
 
 export function Settings() {

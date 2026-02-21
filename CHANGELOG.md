@@ -2,6 +2,9 @@
 
 ## Latest (Not yet packed)
 
+- chore - update 'no data' hint
+- chore - remove google searching as an llm option
+
 ## 1.2.0
 - feat - add "add word" button
 - chore - change the "add word" button text, setting text

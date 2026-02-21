@@ -25,8 +25,7 @@
                 "placeholder": "請選擇",
                 "name": {
                     "perplexity": "Perplexity",
-                    "googleAI": "Google（AI 摘要）",
-                    "google": "Google"
+                    "googleAI": "Google（AI 摘要）"
                 }
             },
             "new_tab": {
